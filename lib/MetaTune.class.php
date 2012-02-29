@@ -52,7 +52,6 @@
  * @package MetaTune
  */
 class MetaTune {
-    const CACHE_DIR = 'lib/cache/'; // Cache directory (must be writable)
     const USE_CACHE = true; // Should caching be activated?
     const CACHE_PREFIX = "METATUNE_CACHE_"; // prefix for cache-files. 
 
@@ -68,6 +67,10 @@ class MetaTune {
     {
         
     }
+
+	public function setCacheDir($cacheDir) {
+		$this->cacheDir = $cacheDir;
+	}
 
     /**
      * Get new instance of this object.
@@ -113,15 +116,15 @@ class MetaTune {
             throw new MetaTuneException(1003);
         }
 
-        if ($input[0] instanceof Artist)
+        if ($input[0] instanceof SpotifyArtist)
         {
             $xml = new MBSimpleXMLElement('<?xml version = "1.0" encoding = "UTF-8"?><artists></artists>');
         }
-        else if ($input[0] instanceof Track)
+        else if ($input[0] instanceof SpotifyTrack)
         {
             $xml = new MBSimpleXMLElement('<?xml version = "1.0" encoding = "UTF-8"?><tracks></tracks>');
         }
-        else if ($input[0] instanceof Album)
+        else if ($input[0] instanceof SpotifyAlbum)
         {
             $xml = new MBSimpleXMLElement('<?xml version = "1.0" encoding = "UTF-8"?><albums></albums>');
         }
@@ -548,10 +551,10 @@ class MetaTune {
             )
         );
 
-        if (self::CACHE_DIR && self::USE_CACHE)
+        if ($this->cacheDir && self::USE_CACHE)
         {
-            $delimiter = (substr(self::CACHE_DIR, -1) != "/") ? "/" : "";
-            $filename = self::CACHE_DIR . $delimiter . self::CACHE_PREFIX . md5($url) . '.xml';
+            $delimiter = (substr($this->cacheDir, -1) != "/") ? "/" : "";
+            $filename = $this->cacheDir . $delimiter . self::CACHE_PREFIX . md5($url) . '.xml';
             if (file_exists($filename))
             {
                 $cacheContents = file_get_contents($filename);
@@ -578,7 +581,7 @@ class MetaTune {
                 // If we're here, the cache header must have been set, so $cacheContents must have contents.
                 $contents = $cacheContents;
             }
-            else if (self::CACHE_DIR && self::USE_CACHE)
+            else if ($this->cacheDir && self::USE_CACHE)
             {
                 // cache data
                 $lastChangedDate = "<!-- Last-Modified: " . str_replace("Last-Modified: ", "", $http_response_header[6]) . " -->";
@@ -608,7 +611,7 @@ class MetaTune {
 
 
 
-        return new Artist((string) $artistId['href'], (string) $artist->name, (double) $artist->popularity, $albums);
+        return new SpotifyArtist((string) $artistId['href'], (string) $artist->name, (double) $artist->popularity, $albums);
     }
 
     /**
@@ -645,7 +648,7 @@ class MetaTune {
         if (!isset($albumInput) || $albumInput == null)
         {
             $albumId = $track->album->attributes();
-            $album = new Album((string) $albumId['href'], (string) $track->album->name, (string) $track->album->released, $artistAlbum);
+            $album = new SpotifyAlbum((string) $albumId['href'], (string) $track->album->name, (string) $track->album->released, $artistAlbum);
             $territories = explode(' ', (string) $track->album->availability->territories);
             $album->setTerritories($territories);
         }
@@ -655,7 +658,7 @@ class MetaTune {
         }
 
         $trackId = $track->attributes();
-        return new Track((string) $trackId['href'], (string) $track->name, $artists, $album, (double) $track->length, (double) $track->popularity, (int) $track->{"track-number"}, $cdnm);
+        return new SpotifyTrack((string) $trackId['href'], (string) $track->name, $artists, $album, (double) $track->length, (double) $track->popularity, (int) $track->{"track-number"}, $cdnm);
     }
 
     /**
@@ -681,7 +684,7 @@ class MetaTune {
             $albumURI = $id;
         }
 
-        $currentAlbum = new Album($albumURI, (string) $album->name, (string) $album->released, $artist, (double) $album->popularity);
+        $currentAlbum = new SpotifyAlbum($albumURI, (string) $album->name, (string) $album->released, $artist, (double) $album->popularity);
 
         $territories = explode(' ', (string) $album->availability->territories);
         $currentAlbum->setTerritories($territories);
