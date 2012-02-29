@@ -24,10 +24,10 @@
  * @uses SpotifyItem
  * @copyright Mikael Brevik 2010
  * @author Mikael Brevik <mikaelbre@gmail.com>
- * @version 1.0
+ * @version 1.0.2
  * @package MetaTune
  */
-class Artist extends SpotifyItem {
+class SpotifyArtist extends SpotifyItem {
 
     private $uri;
     private $name;

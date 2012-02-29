@@ -26,9 +26,9 @@ if(DEBUG) {
 
 // Added a magic function (autoload) to not have to import all the classes
 // if there no use for them.
-function __autoload($class) {
-    $filename = $class . '.class.php';
-    require_once $filename;
-}
+// function __autoload($class) {
+//     $filename = $class . '.class.php';
+//     require_once $filename;
+// }
 // either you have this autoload-function or you must require/include all files.
 
